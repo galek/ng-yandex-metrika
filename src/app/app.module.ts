@@ -1,6 +1,6 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { MetrikaModule } from 'ng-yandex-metrika';
+import { BrowserModule } from '@angular/platform-browser';
+import { MetrikaModule } from 'projects/ng-yandex-metrika/src/lib/ng-yandex-metrika.module';
 
 import { AppComponent } from './app.component';
 
