@@ -5,7 +5,7 @@ import { Metrika } from './ng-yandex-metrika.service';
 import {
   CounterConfig,
   DEFAULT_COUNTER_ID,
-  DEFAULT_COUNTER_ID_AOT,
+  DEFAULT_COUNTER_ID_AOT, stringOrNumber,
   YANDEX_COUNTERS_CONFIGS,
   YANDEX_COUNTERS_CONFIGS_AOT,
 } from './ng-yandex-metrika.config';
@@ -13,7 +13,7 @@ import { appInitializerFactory, countersFactory, defaultCounterIdFactory, } from
 
 @NgModule({})
 export class MetrikaModule {
-  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: number | string): ModuleWithProviders<MetrikaModule> {
+  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: stringOrNumber): ModuleWithProviders<MetrikaModule> {
     return {
       ngModule: MetrikaModule,
       providers: [

@@ -1,6 +1,12 @@
 import { Injectable, Injector } from '@angular/core';
 
-import { DEFAULT_COUNTER_ID, YANDEX_COUNTERS_CONFIGS, YandexCounterConfig } from './ng-yandex-metrika.config';
+import {
+  CounterPosition,
+  DEFAULT_COUNTER_ID, ParamsCounterPositionInterface,
+  stringOrNumber, UserIdCounterPositionInterface,
+  YANDEX_COUNTERS_CONFIGS,
+  YandexCounterConfig
+} from './ng-yandex-metrika.config';
 
 export interface CallbackOptions {
   callback?: () => any;
@@ -20,53 +26,58 @@ export interface HitOptions extends CommonOptions {
   providedIn: 'root'
 })
 export class Metrika {
-  private defaultCounterId: string;
+  private readonly defaultCounterId: string;
   private counterConfigs: YandexCounterConfig[];
-  private positionToId: any[];
+  private readonly positionToId: Array<stringOrNumber>;
 
-  static getCounterNameById(id: string | number) {
+  static getCounterNameById(id: stringOrNumber) {
     return `yaCounter${id}`;
   }
 
-  static getCounterById(id: any) {
+  static getCounterById(id: stringOrNumber) {
     return window[Metrika.getCounterNameById(id)];
   }
 
-  constructor(injector: Injector) {
+  constructor(readonly injector: Injector) {
     this.defaultCounterId = injector.get<string>(DEFAULT_COUNTER_ID);
     this.counterConfigs = injector.get<YandexCounterConfig[]>(YANDEX_COUNTERS_CONFIGS);
     this.positionToId = this.counterConfigs.map(config => config.id);
   }
 
+  // TODO: use string array only - Nick
   async addFileExtension(extensions: string | string[], counterPosition?: number) {
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      counter.addFileExtension(extensions);
+      await counter.addFileExtension(extensions);
     } catch (error) {
       console.warn('Counter is still loading');
     }
   }
 
   async extLink(url: string, options: CommonOptions = {}, counterPosition?: number): Promise<any> {
+    let promise = null;
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      const promise = this.getCallbackPromise(options, url);
-      counter.extLink(url, options);
-      return promise;
+      promise = this.getCallbackPromise(options, url);
+      await counter.extLink(url, options);
     } catch (error) {
       console.warn('Counter is still loading');
     }
+
+    return promise;
   }
 
   async file(url: string, options: HitOptions = {}, counterPosition?: number): Promise<any> {
+    let promise = null;
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      const promise = this.getCallbackPromise(options, url);
-      counter.file(url, options);
-      return promise;
+      promise = this.getCallbackPromise(options, url);
+      await counter.file(url, options);
     } catch (error) {
       console.warn('Counter is still loading');
     }
+
+    return promise;
   }
 
   getClientID(counterPosition?: number): string {
@@ -74,81 +85,92 @@ export class Metrika {
     if (counter && counter.reachGoal) {
       return counter.getClientID();
     }
+
     console.warn('Counter is still loading');
+
+    return '';
   }
 
-  async setUserID(userId: string, counterPosition?: number): Promise<any> {
+  // TODO: add typization
+  async setUserID(userId: string, counterPosition?: number): Promise<UserIdCounterPositionInterface> {
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      counter.setUserID(userId);
-      return {userId, counterPosition};
+      await counter.setUserID(userId);
     } catch (error) {
       console.warn('Counter is still loading');
     }
+
+    return {userId, counterPosition};
   }
 
-  async userParams(params: any, counterPosition?: number): Promise<any> {
+  async userParams<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      counter.userParams(params);
-      return {params, counterPosition};
+      await counter.userParams(params);
     } catch (error) {
       console.warn('Counter is still loading');
     }
+
+    return {params, counterPosition};
   }
 
-  async params(params: any, counterPosition?: number): Promise<any> {
+  async params<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
     try {
       const counter = await this.counterIsLoaded(counterPosition);
       counter.params(params);
-      return {params, counterPosition};
     } catch (error) {
       console.warn('Counter is still loading');
     }
+    return {params, counterPosition};
   }
 
-  async replacePhones(counterPosition?: number): Promise<any> {
+  async replacePhones(counterPosition?: number): Promise<CounterPosition> {
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      counter.replacePhones();
-      return {counterPosition};
+      await counter.replacePhones();
     } catch (error) {
       console.warn('Counter is still loading');
     }
+    return {counterPosition};
   }
 
   async notBounce(options: CallbackOptions = {}, counterPosition?: number): Promise<any> {
+    let promise = null;
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      const promise = this.getCallbackPromise(options, options);
-      counter.notBounce(options);
-      return promise;
+      promise = this.getCallbackPromise(options, options);
+      await counter.notBounce(options);
     } catch (error) {
       console.warn('Counter is still loading');
     }
+
+    return promise;
   }
 
   async fireEvent(type: string, options: CommonOptions = {}, counterPosition?: number): Promise<any> {
+    let promise = null;
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      const promise = this.getCallbackPromise(options, options);
+      promise = this.getCallbackPromise(options, options);
       counter.reachGoal(type, options.params, options.callback, options.ctx);
-      return promise;
     } catch (error) {
       console.error('error', error);
       console.warn(`'Event with type [${type}] can\'t be fired because counter is still loading'`)
     }
+    return promise;
   }
 
   async hit(url: string, options: HitOptions = {}, counterPosition?: number): Promise<any> {
+    let promise = null;
     try {
       const counter = await this.counterIsLoaded(counterPosition);
-      const promise = this.getCallbackPromise(options, options);
-      counter.hit(url, options);
-      return promise;
+      promise = this.getCallbackPromise(options, options);
+      await counter.hit(url, options);
     } catch (error) {
       console.warn(`'Hit for page [${url}] can\'t be fired because counter is still loading'`)
     }
+
+    return promise;
   }
 
   private getCallbackPromise(options: any, resolveWith: any) {

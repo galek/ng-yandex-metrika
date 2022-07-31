@@ -17,7 +17,7 @@ import { MetrikaModule } from 'ng-yandex-metrika';
     MetrikaModule.forRoot(
       {id: 35567075, webvisor: true}, // CounterConfig | CounterConfig[]
       // Можно задать ид счетчика, либо порядковый номер в массиве, необязательный параметрб по умолчанию первый попавшийся.
-      defaultCounter, // number | string
+      defaultCounter, // stringOrNumber
     ),
   ]
 })
@@ -30,7 +30,7 @@ import { MetrikaModule } from 'ng-yandex-metrika';
 
 Для отправки javascript события:
 ```typescript
-constructor(private metrika: Metrika) {}
+constructor(private readonly metrika: Metrika) {}
 
 onClick() {
   this.metrika.fireEvent('some_event_name');
