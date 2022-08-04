@@ -21,5 +21,13 @@
   },
   "scripts": {
     "clean:nix": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && rm -rf build"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.d.ts"
+    },
+    "./index.d.ts": "./src/index.d.ts",
+    "./package.json": "./package.json"
   }
 }
