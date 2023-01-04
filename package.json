@@ -24,12 +24,19 @@
     "clean:nix": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && rm -rf build",
     "build": "tsc -p tsconfig.lib.json"
   },
+  "sideEffects": false,
+  "type": "module",
+  "es2021": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "default": "./src/index.d.ts"
+      "default": "./dist/index.d.ts",
+      "commonjs": "./dist/index.js",
+      "es2021": "./dist/index.js",
+      "node": "./dist/index.js"
     },
     "./index.d.ts": "./src/index.d.ts",
+    "./index.js": "./dist/index.js",
     "./package.json": "./package.json"
   }
 }

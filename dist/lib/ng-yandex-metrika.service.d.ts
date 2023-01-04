@@ -1,0 +1,33 @@
+import { Injector } from '@angular/core';
+import { CommonOptions } from "./common/interfaces/commonOptions.interface";
+import { HitOptions } from "./common/interfaces/hitOptions.interface";
+import { CallbackOptions } from "./common/interfaces/callbackOptions.interface";
+import { YandexCounterConfig } from "./yandexCounterConfig.service";
+import { UserIdCounterPositionInterface } from "./common/interfaces/userIdCounterPosition.interface";
+import { ParamsCounterPositionInterface } from "./common/interfaces/paramsCounterPosition.interface";
+import { CounterPosition } from "./common/interfaces/counterPosition.interface";
+export declare class YandexMetric {
+    readonly injector: Injector;
+    private readonly defaultCounterId;
+    private readonly positionToId;
+    private counterConfigs;
+    constructor(injector: Injector);
+    static getCounterById(id: string): any;
+    static createCounter(config: YandexCounterConfig): any;
+    static getCounterNameById(id: string): string;
+    extLink<T>(url: string, options?: CommonOptions<T>, _counterPosition?: number): Promise<any>;
+    file<T>(url: string, options?: HitOptions<T>, _counterPosition?: number): Promise<any>;
+    getClientID(_counterPosition?: number): string;
+    setUserID(userId: string, counterPosition?: number): Promise<UserIdCounterPositionInterface>;
+    userParams<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>>;
+    params<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>>;
+    replacePhones(counterPosition?: number): Promise<CounterPosition>;
+    notBounce(options?: CallbackOptions, counterPosition?: number): Promise<any>;
+    fireEvent<T>(type: string, options?: CommonOptions<T>, counterPosition?: number): Promise<any>;
+    hit<T>(url: string, options?: HitOptions<T>, counterPosition?: number): Promise<any>;
+    addFileExtension(_extensions: string | string[], _counterPosition?: number): Promise<boolean>;
+    private getCallbackPromise;
+    private counterIsLoaded;
+    private getCounterByPosition;
+    private getCounterIdByPosition;
+}
