@@ -1,0 +1,9 @@
+import {InjectionToken} from '@angular/core';
+import {YandexCounterConfig} from "../yandexCounterConfig.service";
+
+export const DEFAULT_COUNTER_ID_AOT = new InjectionToken<stringOrNumber>('DEFAULT_COUNTER_ID_AOT');
+export const DEFAULT_COUNTER_ID = new InjectionToken<stringOrNumber>('DEFAULT_COUNTER_ID');
+export const YANDEX_COUNTERS_CONFIGS_AOT = new InjectionToken<YandexCounterConfig[]>('YANDEX_COUNTERS_CONFIGS_AOT');
+export const YANDEX_COUNTERS_CONFIGS = new InjectionToken<YandexCounterConfig[]>('YANDEX_COUNTERS_CONFIGS');
+export type stringOrNumber = string | number;
+

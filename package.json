@@ -1,6 +1,6 @@
 {
   "name": "ng-yandex-metrika",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Yandex Metrika for Angular",
   "keywords": [
     "yandex",
@@ -8,19 +8,21 @@
     "ng",
     "angular"
   ],
-  "author": "Lyubimov Roman",
+  "author": "Lyubimov Roman, Nikolay Galko",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "14.1.0",
-    "@angular/compiler": "14.1.0",
-    "@angular/core": "14.1.0",
-    "typescript": "4.7.4"
+    "@angular/common": "^14.1.0",
+    "@angular/compiler": "^14.1.0",
+    "@angular/core": "^14.1.0",
+    "typescript": "^4.7.4"
   },
   "repository": {
-    "url": "git@github.com:FriOne/ng-yandex-metrika.git"
+    "originalUrl": "git@github.com:FriOne/ng-yandex-metrika.git",
+    "url": "git@github.com:galek/ng-yandex-metrika.git"
   },
   "scripts": {
-    "clean:nix": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && rm -rf build"
+    "clean:nix": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && rm -rf build",
+    "build": "tsc -p tsconfig.lib.json"
   },
   "exports": {
     ".": {

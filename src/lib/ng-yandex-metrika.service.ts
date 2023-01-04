@@ -1,42 +1,22 @@
-import { Injectable, Injector } from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 
-import {
-  CounterPosition,
-  DEFAULT_COUNTER_ID, ParamsCounterPositionInterface,
-  stringOrNumber, UserIdCounterPositionInterface,
-  YANDEX_COUNTERS_CONFIGS,
-  YandexCounterConfig
-} from './ng-yandex-metrika.config';
-
-export interface CallbackOptions {
-  callback?: () => any;
-  ctx?: any;
-}
-
-export interface CommonOptions extends CallbackOptions {
-  params?: any;
-  title?: any;
-}
-
-export interface HitOptions extends CommonOptions {
-  referer?: string;
-}
+import {CommonOptions} from "./common/interfaces/commonOptions.interface";
+import {HitOptions} from "./common/interfaces/hitOptions.interface";
+import {CallbackOptions} from "./common/interfaces/callbackOptions.interface";
+import {DEFAULT_COUNTER_ID, stringOrNumber, YANDEX_COUNTERS_CONFIGS} from "./common/constants.service";
+import {YandexCounterConfig} from "./yandexCounterConfig.service";
+import {UtilsGetCounterNameById} from "./common/shared.utils";
+import {UserIdCounterPositionInterface} from "./common/interfaces/userIdCounterPosition.interface";
+import {ParamsCounterPositionInterface} from "./common/interfaces/paramsCounterPosition.interface";
+import {CounterPosition} from "./common/interfaces/counterPosition.interface";
 
 @Injectable({
   providedIn: 'root'
 })
-export class Metrika {
+export class YandexMetric {
   private readonly defaultCounterId: string;
-  private counterConfigs: YandexCounterConfig[];
   private readonly positionToId: Array<stringOrNumber>;
-
-  static getCounterNameById(id: stringOrNumber) {
-    return `yaCounter${id}`;
-  }
-
-  static getCounterById(id: stringOrNumber) {
-    return window[Metrika.getCounterNameById(id)];
-  }
+  private counterConfigs: YandexCounterConfig[];
 
   constructor(readonly injector: Injector) {
     this.defaultCounterId = injector.get<string>(DEFAULT_COUNTER_ID);
@@ -44,139 +24,183 @@ export class Metrika {
     this.positionToId = this.counterConfigs.map(config => config.id);
   }
 
-  // TODO: use string array only - Nick
-  async addFileExtension(extensions: string | string[], counterPosition?: number) {
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      await counter.addFileExtension(extensions);
-    } catch (error) {
-      console.warn('Counter is still loading');
+  static getCounterById(id: stringOrNumber) {
+    if (!window) {
+      console.error(`[YandexMetric.getCounterById] not exist ptr to window`);
+      return null;
     }
+
+    if (!(UtilsGetCounterNameById(id)?.length > 0)) {
+      console.error(`[YandexMetric.getCounterById] not exist YandexMetric.getCounterNameById with id: ${id}`);
+      return null;
+    }
+
+    const ptr = window[UtilsGetCounterNameById(id)];
+    if (!ptr) {
+      console.error(`[YandexMetric.getCounterById] not exist window[YandexMetric.getCounterNameById] with id: ${id}`);
+      return null;
+    }
+
+    return ptr;
   }
 
-  async extLink(url: string, options: CommonOptions = {}, counterPosition?: number): Promise<any> {
+  async addFileExtension(_extensions: string | string[], _counterPosition?: number) {
+    let counter = null;
+
+    if (_counterPosition !== null && _counterPosition !== undefined) {
+      counter = await this.counterIsLoaded(_counterPosition);
+    }
+
+    if (!counter) {
+      console.error(`[YandexMetric.addFileExtension] counter ptr is not exist`);
+      return false;
+    }
+
+    if (!Array.isArray(_extensions)) {
+      await counter.addFileExtension(_extensions);
+      return true;
+    }
+
+    for (const ext of _extensions) {
+      if (!ext) {
+        console.warn(`[] not exist ext pointer`);
+        continue;
+      }
+
+      await counter.addFileExtension(ext);
+    }
+
+    return true;
+  }
+
+  async extLink<T>(url: string, options: CommonOptions<T> = null, _counterPosition?: number): Promise<any> {
+    let counter = null;
+
+    if (_counterPosition !== null && _counterPosition !== undefined) {
+      counter = await this.counterIsLoaded(_counterPosition);
+    }
+    if (!counter) {
+      console.error(`[YandexMetric.extLink] counter ptr is not exist. For url: ${url}`);
+      return null;
+    }
+
+    await counter.extLink(url, options);
+
+    return this.getCallbackPromise(options, url);
+  }
+
+  async file<T>(url: string, options: HitOptions<T> = null, _counterPosition?: number): Promise<any> {
     let promise = null;
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      promise = this.getCallbackPromise(options, url);
-      await counter.extLink(url, options);
-    } catch (error) {
-      console.warn('Counter is still loading');
+
+    const counter = await this.counterIsLoaded(_counterPosition);
+    if (!counter) {
+      console.error(`[YandexMetric.file] counter ptr is not exist. For url: ${url}`);
+      return null;
     }
 
-    return promise;
+    await counter.file(url, options);
+
+    return this.getCallbackPromise(options, url);
   }
 
-  async file(url: string, options: HitOptions = {}, counterPosition?: number): Promise<any> {
-    let promise = null;
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      promise = this.getCallbackPromise(options, url);
-      await counter.file(url, options);
-    } catch (error) {
-      console.warn('Counter is still loading');
-    }
-
-    return promise;
-  }
-
-  getClientID(counterPosition?: number): string {
-    const counter = this.getCounterByPosition(counterPosition);
+  getClientID(_counterPosition?: number): string {
+    const counter = this.getCounterByPosition(_counterPosition);
     if (counter && counter.reachGoal) {
       return counter.getClientID();
     }
 
-    console.warn('Counter is still loading');
+    console.warn('[YandexMetric.getClientID] Counter is still loading');
 
     return '';
   }
 
-  // TODO: add typization
   async setUserID(userId: string, counterPosition?: number): Promise<UserIdCounterPositionInterface> {
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      await counter.setUserID(userId);
-    } catch (error) {
-      console.warn('Counter is still loading');
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.error(`[YandexMetric.setUserID] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
     }
+    await counter.setUserID(userId);
 
     return {userId, counterPosition};
   }
 
   async userParams<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      await counter.userParams(params);
-    } catch (error) {
-      console.warn('Counter is still loading');
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.error(`[YandexMetric.userParams] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
     }
+
+    await counter.userParams(params);
 
     return {params, counterPosition};
   }
 
   async params<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      counter.params(params);
-    } catch (error) {
-      console.warn('Counter is still loading');
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter || !params) {
+      console.error(`[YandexMetric.params] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
     }
+
+    counter.params(params);
+
     return {params, counterPosition};
   }
 
   async replacePhones(counterPosition?: number): Promise<CounterPosition> {
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      await counter.replacePhones();
-    } catch (error) {
-      console.warn('Counter is still loading');
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.error(`[YandexMetric.replacePhones] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
     }
+
+    await counter.replacePhones();
+
     return {counterPosition};
   }
 
-  async notBounce(options: CallbackOptions = {}, counterPosition?: number): Promise<any> {
-    let promise = null;
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      promise = this.getCallbackPromise(options, options);
-      await counter.notBounce(options);
-    } catch (error) {
-      console.warn('Counter is still loading');
+  async notBounce(options: CallbackOptions = null, counterPosition?: number): Promise<any> {
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.error(`[YandexMetric.notBounce] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
     }
 
-    return promise;
+    await counter.notBounce(options);
+
+    return this.getCallbackPromise(options, options);
   }
 
-  async fireEvent(type: string, options: CommonOptions = {}, counterPosition?: number): Promise<any> {
-    let promise = null;
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      promise = this.getCallbackPromise(options, options);
-      counter.reachGoal(type, options.params, options.callback, options.ctx);
-    } catch (error) {
-      console.error('error', error);
-      console.warn(`'Event with type [${type}] can\'t be fired because counter is still loading'`)
+  async fireEvent<T>(type: string, options: CommonOptions<T> = null, counterPosition?: number): Promise<any> {
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.warn(`[YandexMetric.hit] 'Event with type [${type}] can\'t be fired because counter is still loading`);
+      return null;
     }
-    return promise;
+
+    counter.reachGoal(type, options.params, options.callback, options.ctx);
+
+    return this.getCallbackPromise(options, options);
   }
 
-  async hit(url: string, options: HitOptions = {}, counterPosition?: number): Promise<any> {
-    let promise = null;
-    try {
-      const counter = await this.counterIsLoaded(counterPosition);
-      promise = this.getCallbackPromise(options, options);
-      await counter.hit(url, options);
-    } catch (error) {
-      console.warn(`'Hit for page [${url}] can\'t be fired because counter is still loading'`)
+  async hit<T>(url: string, options: HitOptions<T> = null, counterPosition?: number): Promise<any> {
+    const counter = await this.counterIsLoaded(counterPosition);
+    if (!counter) {
+      console.warn(`[YandexMetric.hit] Hit for page [${url}] can\'t be fired because counter is still loading`)
+      return null;
     }
 
-    return promise;
+    await counter.hit(url, options);
+
+    return this.getCallbackPromise(options, options);
   }
 
   private getCallbackPromise(options: any, resolveWith: any) {
     return new Promise((resolve, reject) => {
       const optionsCallback = options.callback;
-      options.callback = function() {
+      options.callback = function () {
         if (optionsCallback) {
           optionsCallback.call(this);
         }
@@ -196,10 +220,10 @@ export class Metrika {
 
   private getCounterByPosition(counterPosition?: number) {
     const counterId = this.getCounterIdByPosition(counterPosition);
-    return Metrika.getCounterById(counterId);
+    return YandexMetric.getCounterById(counterId);
   }
 
-  private getCounterIdByPosition(counterPosition: number) {
+  private getCounterIdByPosition(counterPosition: number): stringOrNumber {
     return (counterPosition === undefined)
       ? this.defaultCounterId
       : this.positionToId[counterPosition];

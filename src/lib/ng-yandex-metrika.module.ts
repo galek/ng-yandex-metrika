@@ -1,21 +1,22 @@
 import { APP_INITIALIZER, Injector, ModuleWithProviders, NgModule } from '@angular/core';
 import { PLATFORM_ID } from '@angular/core';
 
-import { Metrika } from './ng-yandex-metrika.service';
-import {
-  CounterConfig,
-  DEFAULT_COUNTER_ID,
-  DEFAULT_COUNTER_ID_AOT, stringOrNumber,
-  YANDEX_COUNTERS_CONFIGS,
-  YANDEX_COUNTERS_CONFIGS_AOT,
-} from './ng-yandex-metrika.config';
+import { YandexMetric } from './ng-yandex-metrika.service';
 import { appInitializerFactory, countersFactory, defaultCounterIdFactory, } from './ng-yandex-metrika-config-factories';
+import {CounterConfig} from "./common/interfaces/counterConfig.interface";
+import {
+  DEFAULT_COUNTER_ID,
+  DEFAULT_COUNTER_ID_AOT,
+  stringOrNumber,
+  YANDEX_COUNTERS_CONFIGS,
+  YANDEX_COUNTERS_CONFIGS_AOT
+} from "./common/constants.service";
 
 @NgModule({})
-export class MetrikaModule {
-  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: stringOrNumber): ModuleWithProviders<MetrikaModule> {
+export class YandexMetricModule {
+  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: stringOrNumber): ModuleWithProviders<YandexMetricModule> {
     return {
-      ngModule: MetrikaModule,
+      ngModule: YandexMetricModule,
       providers: [
         {
           provide: DEFAULT_COUNTER_ID_AOT,
@@ -42,8 +43,8 @@ export class MetrikaModule {
           multi: true,
         },
         {
-          provide: Metrika,
-          useClass: Metrika,
+          provide: YandexMetric,
+          useClass: YandexMetric,
           deps: [Injector, PLATFORM_ID],
         }
       ],
