@@ -1,7 +1,5 @@
-import {stringOrNumber} from "../constants.service";
-
 export interface CounterConfig {
-  id: stringOrNumber;
+  id: string;
   params?: any;
   clickmap?: boolean;
   trackLinks?: boolean;

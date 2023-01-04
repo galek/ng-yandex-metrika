@@ -1,9 +1,8 @@
-import {stringOrNumber} from "./constants.service";
 import {YandexCounterConfig} from "../yandexCounterConfig.service";
 
 export declare var Ya: any;
 
-export const UtilsGetCounterNameById = (id: stringOrNumber) => {
+export const UtilsGetCounterNameById = (id: string) => {
   return `yaCounter${id}`;
 }
 
@@ -22,7 +21,7 @@ export const insertYandexMetric = (counterConfigs: YandexCounterConfig[]) => {
     try {
       for (const config of counterConfigs) {
         if (!config) {
-          console.error(`[insertMetrika] not exist config in counterConfigs`);
+          console.error(`[insertYandexMetric] not exist config in counterConfigs`);
           continue;
         }
 

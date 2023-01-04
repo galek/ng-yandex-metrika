@@ -1,8 +1,7 @@
 import {CounterConfig} from "./common/interfaces/counterConfig.interface";
-import {stringOrNumber} from "./common/constants.service";
 
 export class YandexCounterConfig implements CounterConfig {
-  id: stringOrNumber;
+  id: string;
   params: any;
   clickmap = true;
   trackLinks = true;

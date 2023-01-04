@@ -7,14 +7,13 @@ import {CounterConfig} from "./common/interfaces/counterConfig.interface";
 import {
   DEFAULT_COUNTER_ID,
   DEFAULT_COUNTER_ID_AOT,
-  stringOrNumber,
   YANDEX_COUNTERS_CONFIGS,
   YANDEX_COUNTERS_CONFIGS_AOT
 } from "./common/constants.service";
 
 @NgModule({})
 export class YandexMetricModule {
-  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: stringOrNumber): ModuleWithProviders<YandexMetricModule> {
+  static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: string): ModuleWithProviders<YandexMetricModule> {
     return {
       ngModule: YandexMetricModule,
       providers: [

@@ -3,9 +3,9 @@ import {Injectable, Injector} from '@angular/core';
 import {CommonOptions} from "./common/interfaces/commonOptions.interface";
 import {HitOptions} from "./common/interfaces/hitOptions.interface";
 import {CallbackOptions} from "./common/interfaces/callbackOptions.interface";
-import {DEFAULT_COUNTER_ID, stringOrNumber, YANDEX_COUNTERS_CONFIGS} from "./common/constants.service";
+import {DEFAULT_COUNTER_ID, YANDEX_COUNTERS_CONFIGS} from "./common/constants.service";
 import {YandexCounterConfig} from "./yandexCounterConfig.service";
-import {UtilsGetCounterNameById} from "./common/shared.utils";
+import {UtilsCreateCounter, UtilsGetCounterNameById} from "./common/shared.utils";
 import {UserIdCounterPositionInterface} from "./common/interfaces/userIdCounterPosition.interface";
 import {ParamsCounterPositionInterface} from "./common/interfaces/paramsCounterPosition.interface";
 import {CounterPosition} from "./common/interfaces/counterPosition.interface";
@@ -15,7 +15,7 @@ import {CounterPosition} from "./common/interfaces/counterPosition.interface";
 })
 export class YandexMetric {
   private readonly defaultCounterId: string;
-  private readonly positionToId: Array<stringOrNumber>;
+  private readonly positionToId: Array<string>;
   private counterConfigs: YandexCounterConfig[];
 
   constructor(readonly injector: Injector) {
@@ -24,7 +24,7 @@ export class YandexMetric {
     this.positionToId = this.counterConfigs.map(config => config.id);
   }
 
-  static getCounterById(id: stringOrNumber) {
+  static getCounterById(id: string) {
     if (!window) {
       console.error(`[YandexMetric.getCounterById] not exist ptr to window`);
       return null;
@@ -44,33 +44,12 @@ export class YandexMetric {
     return ptr;
   }
 
-  async addFileExtension(_extensions: string | string[], _counterPosition?: number) {
-    let counter = null;
+  static createCounter(config: YandexCounterConfig) {
+    return UtilsCreateCounter(config);
+  }
 
-    if (_counterPosition !== null && _counterPosition !== undefined) {
-      counter = await this.counterIsLoaded(_counterPosition);
-    }
-
-    if (!counter) {
-      console.error(`[YandexMetric.addFileExtension] counter ptr is not exist`);
-      return false;
-    }
-
-    if (!Array.isArray(_extensions)) {
-      await counter.addFileExtension(_extensions);
-      return true;
-    }
-
-    for (const ext of _extensions) {
-      if (!ext) {
-        console.warn(`[] not exist ext pointer`);
-        continue;
-      }
-
-      await counter.addFileExtension(ext);
-    }
-
-    return true;
+  static getCounterNameById(id: string) {
+    return UtilsGetCounterNameById(id);
   }
 
   async extLink<T>(url: string, options: CommonOptions<T> = null, _counterPosition?: number): Promise<any> {
@@ -84,11 +63,25 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.extLink
     await counter.extLink(url, options);
 
     return this.getCallbackPromise(options, url);
   }
 
+  /*
+  * YandexMetric function params:
+  ** url - string
+  ** options:
+  *** - callback - Function
+  *** - ctx - Object of context (this)
+  *** - referer String
+  *** - title String
+  *** - params Object
+  **** - order_price Number
+  **** - currency String
+  * https://yandex.ru/support/metrica/objects/file.html
+  * */
   async file<T>(url: string, options: HitOptions<T> = null, _counterPosition?: number): Promise<any> {
     let promise = null;
 
@@ -98,6 +91,7 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.file
     await counter.file(url, options);
 
     return this.getCallbackPromise(options, url);
@@ -120,6 +114,8 @@ export class YandexMetric {
       console.error(`[YandexMetric.setUserID] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
       return null;
     }
+
+    // Обращаемся к Ya.setUserID
     await counter.setUserID(userId);
 
     return {userId, counterPosition};
@@ -132,6 +128,7 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.userParams
     await counter.userParams(params);
 
     return {params, counterPosition};
@@ -144,6 +141,7 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.params
     counter.params(params);
 
     return {params, counterPosition};
@@ -156,6 +154,7 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.replacePhones
     await counter.replacePhones();
 
     return {counterPosition};
@@ -168,6 +167,7 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.notBounce
     await counter.notBounce(options);
 
     return this.getCallbackPromise(options, options);
@@ -180,11 +180,25 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.reachGoal
     counter.reachGoal(type, options.params, options.callback, options.ctx);
 
     return this.getCallbackPromise(options, options);
   }
 
+  /*
+  * YandexMetric function params:
+  ** url - string
+  ** options:
+  *** - callback - Function
+  *** - ctx - Object of context (this)
+  *** - referer String
+  *** - title String
+  *** - params Object
+  **** - order_price Number
+  **** - currency String
+  * https://yandex.ru/support/metrica/objects/hit.html
+  * */
   async hit<T>(url: string, options: HitOptions<T> = null, counterPosition?: number): Promise<any> {
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
@@ -192,9 +206,31 @@ export class YandexMetric {
       return null;
     }
 
+    // Обращаемся к Ya.hit
     await counter.hit(url, options);
 
     return this.getCallbackPromise(options, options);
+  }
+
+  /*
+  * YandexMetric function params:
+  ** extensions: string | string[]
+  * https://yandex.ru/support/metrica/objects/addfileextension.html
+  * */
+  async addFileExtension(_extensions: string | string[], _counterPosition?: number) {
+    let counter = null;
+
+    if (_counterPosition !== null && _counterPosition !== undefined) {
+      counter = await this.counterIsLoaded(_counterPosition);
+    }
+
+    if (!counter) {
+      console.error(`[YandexMetric.addFileExtension] counter ptr is not exist`);
+      return false;
+    }
+
+    await counter.addFileExtension(_extensions);
+    return true;
   }
 
   private getCallbackPromise(options: any, resolveWith: any) {
@@ -223,7 +259,7 @@ export class YandexMetric {
     return YandexMetric.getCounterById(counterId);
   }
 
-  private getCounterIdByPosition(counterPosition: number): stringOrNumber {
+  private getCounterIdByPosition(counterPosition: number): string {
     return (counterPosition === undefined)
       ? this.defaultCounterId
       : this.positionToId[counterPosition];

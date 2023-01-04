@@ -1,17 +1,16 @@
 import {CounterConfig} from "./common/interfaces/counterConfig.interface";
 import {isPlatformBrowser} from '@angular/common';
-import {stringOrNumber} from "./common/constants.service";
 import {YandexCounterConfig} from "./yandexCounterConfig.service";
 import {insertYandexMetric} from "./common/shared.utils";
 
-export const defaultCounterIdFactory = (counterConfigs: CounterConfig | CounterConfig[], defaultCounter?: stringOrNumber) => {
+export const defaultCounterIdFactory = (counterConfigs: CounterConfig | CounterConfig[], defaultCounter?: string) => {
   return defineDefaultId(counterConfigs, defaultCounter);
 }
 
-export const defineDefaultId = (counterConfigs: CounterConfig | CounterConfig[], defaultCounter?: stringOrNumber): stringOrNumber | null => {
+const defineDefaultId = (counterConfigs: CounterConfig | CounterConfig[], defaultCounter?: string): string | null => {
   const configs: CounterConfig[] = getCounterConfigArray(counterConfigs);
 
-  let defaultId: stringOrNumber;
+  let defaultId: string;
 
   if (!defaultCounter) {
     defaultId = configs[0].id;
@@ -53,14 +52,14 @@ export const countersFactory = (configs: CounterConfig | CounterConfig[]) => {
   return createConfigs(configs);
 }
 
-export const createConfigs = (configs: CounterConfig | CounterConfig[]) => {
+const createConfigs = (configs: CounterConfig | CounterConfig[]) => {
   return getCounterConfigArray(configs).map((config: CounterConfig) => Object.assign(new YandexCounterConfig(), config));
 }
 
 /*
 * Convert configs to ConfigArray
 * */
-export const getCounterConfigArray = (configs: CounterConfig | CounterConfig[]) => {
+const getCounterConfigArray = (configs: CounterConfig | CounterConfig[]) => {
   const counterConfigs: CounterConfig[] = !Array.isArray(configs) ? [configs as CounterConfig] : configs;
   return counterConfigs;
 }

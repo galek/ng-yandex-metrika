@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../out-tsc/lib",
+    "outDir": "dist/lib",
     "target": "es2021",
     "module": "es2015",
     "moduleResolution": "node",
@@ -27,6 +27,7 @@
   },
   "exclude": [
     "src/test.ts",
+    "dist/*",
     "**/*.spec.ts"
   ]
 }
