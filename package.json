@@ -26,16 +26,21 @@
   },
   "sideEffects": false,
   "type": "module",
+  "module": "./dist/index.js",
   "es2021": "./dist/index.js",
+  "es2020": "./dist/index.js",
+  "typings": "./src/index.d.ts",
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "default": "./dist/index.d.ts",
+      "default": "./dist/index.js",
+      "node": "./dist/index.js",
       "commonjs": "./dist/index.js",
       "es2021": "./dist/index.js",
-      "node": "./dist/index.js"
+      "es2020": "./dist/index.js",
+      "es2015": "./dist/index.js"
     },
-    "./index.d.ts": "./src/index.d.ts",
+    "./index.d.ts": "./dist/index.d.ts",
     "./index.js": "./dist/index.js",
     "./package.json": "./package.json"
   },
