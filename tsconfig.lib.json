@@ -4,7 +4,6 @@
     "inlineSources": true,
     "emitDecoratorMetadata": true,
     "types": [],
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -17,6 +16,9 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "target": "es2021",
     "module": "es2020",
     "lib": [

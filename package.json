@@ -26,25 +26,12 @@
   },
   "sideEffects": false,
   "type": "module",
-  "module": "dist/lib/index.js",
-  "es2021": "dist/lib/index.js",
-  "es2020": "dist/lib/index.js",
-  "typings": "src/lib/index.d.ts",
-  "exports": {
-    "./package.json": {
-      "default": "./package.json"
-    },
-    ".": {
-      "types": "./index.d.ts",
-      "esm2020": "./dist/lib/index.js",
-      "es2020": "./dist/lib/index.js",
-      "es2015": "./dist/lib/index.js",
-      "node": "./dist/lib/index.jss",
-      "default": "./dist/lib/index.js"
-    },
-    "./dist": "./dist",
-    "./dist/lib": "./dist/lib"
-  },
+  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "rimraf": "4.0.5"
   }
