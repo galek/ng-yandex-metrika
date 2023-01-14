@@ -43,7 +43,7 @@ export const countersFactory = (configs) => {
     return createConfigs(configs);
 };
 const createConfigs = (configs) => {
-    return getCounterConfigArray(configs).map((config) => Object.assign(new YandexCounterConfig(), config));
+    return getCounterConfigArray(configs).map((config) => new YandexCounterConfig(config));
 };
 /*
 * Convert configs to ConfigArray

@@ -1,1 +1,0 @@
-{"version":3,"file":"paramsCounterPosition.interface.js","sourceRoot":"","sources":["../../../../src/lib/common/interfaces/paramsCounterPosition.interface.ts"],"names":[],"mappings":"","sourcesContent":["import {CounterPosition} from \"./counterPosition.interface\";\r\n\r\nexport interface ParamsCounterPositionInterface<T1> extends CounterPosition {\r\n  params: T1;\r\n}\r\n"]}

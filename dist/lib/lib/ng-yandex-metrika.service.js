@@ -15,11 +15,12 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
             console.error(`[YandexMetric.getCounterById] not exist ptr to window`);
             return null;
         }
-        if (!(UtilsGetCounterNameById(id)?.length > 0)) {
+        const counterName = UtilsGetCounterNameById(id);
+        if (!(counterName?.length > 0)) {
             console.error(`[YandexMetric.getCounterById] not exist YandexMetric.getCounterNameById with id: ${id}`);
             return null;
         }
-        const ptr = window[UtilsGetCounterNameById(id)];
+        const ptr = window[counterName];
         if (!ptr) {
             console.error(`[YandexMetric.getCounterById] not exist window[YandexMetric.getCounterNameById] with id: ${id}`);
             return null;
@@ -59,7 +60,10 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
     * https://yandex.ru/support/metrica/objects/file.html
     * */
     async file(url, options = null, _counterPosition) {
-        let promise = null;
+        if (!options) {
+            console.error(`[YandexMetric.file] options ptr is not exist. For _counterPosition: ${_counterPosition}`);
+            return null;
+        }
         const counter = await this.counterIsLoaded(_counterPosition);
         if (!counter) {
             console.error(`[YandexMetric.file] counter ptr is not exist. For url: ${url}`);
@@ -118,6 +122,10 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
         return { counterPosition };
     }
     async notBounce(options = null, counterPosition) {
+        if (!options) {
+            console.error(`[YandexMetric.notBounce] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+            return null;
+        }
         const counter = await this.counterIsLoaded(counterPosition);
         if (!counter) {
             console.error(`[YandexMetric.notBounce] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -128,6 +136,10 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
         return this.getCallbackPromise(options, options);
     }
     async fireEvent(type, options = null, counterPosition) {
+        if (!options) {
+            console.error(`[YandexMetric.fireEvent] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+            return null;
+        }
         const counter = await this.counterIsLoaded(counterPosition);
         if (!counter) {
             console.warn(`[YandexMetric.hit] 'Event with type [${type}] can\'t be fired because counter is still loading`);
@@ -151,6 +163,10 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
     * https://yandex.ru/support/metrica/objects/hit.html
     * */
     async hit(url, options = null, counterPosition) {
+        if (!options) {
+            console.error(`[YandexMetric.hit] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+            return null;
+        }
         const counter = await this.counterIsLoaded(counterPosition);
         if (!counter) {
             console.warn(`[YandexMetric.hit] Hit for page [${url}] can\'t be fired because counter is still loading`);
@@ -202,9 +218,7 @@ let YandexMetric = YandexMetric_1 = class YandexMetric {
         return YandexMetric_1.getCounterById(counterId);
     }
     getCounterIdByPosition(counterPosition) {
-        return (counterPosition === undefined)
-            ? this.defaultCounterId
-            : this.positionToId[counterPosition];
+        return (counterPosition === undefined) ? this.defaultCounterId : this.positionToId[counterPosition];
     }
 };
 YandexMetric = YandexMetric_1 = __decorate([

@@ -1,12 +1,18 @@
 export const UtilsGetCounterNameById = (id) => {
     return `yaCounter${id}`;
 };
+export const isExist = (obj) => {
+    return obj !== null && obj !== undefined;
+};
 export const UtilsCreateCounter = (config) => {
     if (!Ya) {
         console.error(`[Yandex.Metric] not exist 3DParty script`);
         return null;
     }
-    window[UtilsGetCounterNameById(config.id)] = new Ya.Metrika2(config);
+    const ptr = new Ya.Metrika2(config);
+    const keyName = UtilsGetCounterNameById(config.id);
+    window[keyName] = ptr;
+    return ptr;
 };
 export const insertYandexMetric = (counterConfigs) => {
     const name = 'yandex_metrika_callbacks2';
@@ -35,7 +41,13 @@ export const insertYandexMetric = (counterConfigs) => {
     else {
         s.src = 'https://mc.yandex.ru/metrika/tag.js';
     }
-    const insetScriptTag = () => n.parentNode.insertBefore(s, n);
+    const insetScriptTag = () => {
+        if (!n?.parentNode) {
+            console.error(`[YandexMetric.insetScriptTag] not exist parentNode`);
+            return;
+        }
+        n.parentNode.insertBefore(s, n);
+    };
     if (window?.opera === '[object Opera]') {
         document.addEventListener('DOMContentLoaded', insetScriptTag, false);
     }

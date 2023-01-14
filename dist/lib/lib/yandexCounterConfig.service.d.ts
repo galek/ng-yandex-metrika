@@ -11,4 +11,5 @@ export declare class YandexCounterConfig implements CounterConfig {
     ecommerce?: string;
     triggerEvent?: boolean;
     alternative?: boolean;
+    constructor(cfg: CounterConfig);
 }

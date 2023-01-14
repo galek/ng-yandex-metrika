@@ -1,8 +1,7 @@
-import { APP_INITIALIZER, Injector, ModuleWithProviders, NgModule } from '@angular/core';
-import { PLATFORM_ID } from '@angular/core';
+import {APP_INITIALIZER, Injector, ModuleWithProviders, NgModule, PLATFORM_ID} from '@angular/core';
 
-import { YandexMetric } from './ng-yandex-metrika.service';
-import { appInitializerFactory, countersFactory, defaultCounterIdFactory, } from './ng-yandex-metrika-config-factories';
+import {YandexMetric} from './ng-yandex-metrika.service';
+import {appInitializerFactory, countersFactory, defaultCounterIdFactory,} from './ng-yandex-metrika-config-factories';
 import {CounterConfig} from "./common/interfaces/counterConfig.interface";
 import {
   DEFAULT_COUNTER_ID,

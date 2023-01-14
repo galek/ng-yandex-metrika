@@ -1,7 +1,7 @@
 {
   "name": "ng-yandex-metrika",
-  "version": "5.1.0",
-  "description": "Yandex Metrika for Angular",
+  "version": "5.1.1",
+  "description": "Yandex Metric for Angular",
   "keywords": [
     "yandex",
     "metrika",
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "clean:nix": "rm -rf node_modules && rm -rf package-lock.json && rm -rf dist && rm -rf build",
-    "build": "tsc -p tsconfig.lib.json"
+    "build": "rimraf dist && tsc -p tsconfig.lib.json"
   },
   "sideEffects": false,
   "type": "module",
@@ -38,5 +38,8 @@
     "./index.d.ts": "./src/index.d.ts",
     "./index.js": "./dist/index.js",
     "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "rimraf": "4.0.5"
   }
 }

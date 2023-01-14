@@ -1,0 +1,1 @@
+{"version":3,"file":"callbackOptions.interface.js","sourceRoot":"","sources":["../../../../../src/lib/common/interfaces/callbackOptions.interface.ts"],"names":[],"mappings":"","sourcesContent":["export interface CallbackOptions {\r\n  callback: () => any;\r\n  ctx: any;\r\n}\r\n"]}

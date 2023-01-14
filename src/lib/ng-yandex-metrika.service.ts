@@ -30,12 +30,13 @@ export class YandexMetric {
       return null;
     }
 
-    if (!(UtilsGetCounterNameById(id)?.length > 0)) {
+    const counterName: string = UtilsGetCounterNameById(id);
+    if (!(counterName?.length > 0)) {
       console.error(`[YandexMetric.getCounterById] not exist YandexMetric.getCounterNameById with id: ${id}`);
       return null;
     }
 
-    const ptr = window[UtilsGetCounterNameById(id)];
+    const ptr = (window as any)[counterName];
     if (!ptr) {
       console.error(`[YandexMetric.getCounterById] not exist window[YandexMetric.getCounterNameById] with id: ${id}`);
       return null;
@@ -52,7 +53,7 @@ export class YandexMetric {
     return UtilsGetCounterNameById(id);
   }
 
-  async extLink<T>(url: string, options: CommonOptions<T> = null, _counterPosition?: number): Promise<any> {
+  async extLink<T>(url: string, options: CommonOptions<T> | null = null, _counterPosition?: number): Promise<any> {
     let counter = null;
 
     if (_counterPosition !== null && _counterPosition !== undefined) {
@@ -82,8 +83,11 @@ export class YandexMetric {
   **** - currency String
   * https://yandex.ru/support/metrica/objects/file.html
   * */
-  async file<T>(url: string, options: HitOptions<T> = null, _counterPosition?: number): Promise<any> {
-    let promise = null;
+  async file<T>(url: string, options: HitOptions<T> | null = null, _counterPosition: number): Promise<any> {
+    if (!options) {
+      console.error(`[YandexMetric.file] options ptr is not exist. For _counterPosition: ${_counterPosition}`);
+      return null;
+    }
 
     const counter = await this.counterIsLoaded(_counterPosition);
     if (!counter) {
@@ -97,7 +101,7 @@ export class YandexMetric {
     return this.getCallbackPromise(options, url);
   }
 
-  getClientID(_counterPosition?: number): string {
+  getClientID(_counterPosition: number): string {
     const counter = this.getCounterByPosition(_counterPosition);
     if (counter && counter.reachGoal) {
       return counter.getClientID();
@@ -108,7 +112,7 @@ export class YandexMetric {
     return '';
   }
 
-  async setUserID(userId: string, counterPosition?: number): Promise<UserIdCounterPositionInterface> {
+  async setUserID(userId: string, counterPosition: number): Promise<UserIdCounterPositionInterface | null> {
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.error(`[YandexMetric.setUserID] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -121,7 +125,7 @@ export class YandexMetric {
     return {userId, counterPosition};
   }
 
-  async userParams<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
+  async userParams<T>(params: T, counterPosition: number): Promise<ParamsCounterPositionInterface<T> | null> {
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.error(`[YandexMetric.userParams] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -134,7 +138,7 @@ export class YandexMetric {
     return {params, counterPosition};
   }
 
-  async params<T>(params: T, counterPosition?: number): Promise<ParamsCounterPositionInterface<T>> {
+  async params<T>(params: T, counterPosition: number): Promise<ParamsCounterPositionInterface<T> | null> {
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter || !params) {
       console.error(`[YandexMetric.params] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -147,7 +151,7 @@ export class YandexMetric {
     return {params, counterPosition};
   }
 
-  async replacePhones(counterPosition?: number): Promise<CounterPosition> {
+  async replacePhones(counterPosition: number): Promise<CounterPosition | null> {
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.error(`[YandexMetric.replacePhones] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -160,7 +164,12 @@ export class YandexMetric {
     return {counterPosition};
   }
 
-  async notBounce(options: CallbackOptions = null, counterPosition?: number): Promise<any> {
+  async notBounce(options: CallbackOptions | null = null, counterPosition: number): Promise<any> {
+    if (!options) {
+      console.error(`[YandexMetric.notBounce] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
+    }
+
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.error(`[YandexMetric.notBounce] counter ptr is not exist. For _counterPosition: ${counterPosition}`);
@@ -173,7 +182,12 @@ export class YandexMetric {
     return this.getCallbackPromise(options, options);
   }
 
-  async fireEvent<T>(type: string, options: CommonOptions<T> = null, counterPosition?: number): Promise<any> {
+  async fireEvent<T>(type: string, options: CommonOptions<T> | null = null, counterPosition: number): Promise<any> {
+    if (!options) {
+      console.error(`[YandexMetric.fireEvent] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
+    }
+
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.warn(`[YandexMetric.hit] 'Event with type [${type}] can\'t be fired because counter is still loading`);
@@ -199,7 +213,12 @@ export class YandexMetric {
   **** - currency String
   * https://yandex.ru/support/metrica/objects/hit.html
   * */
-  async hit<T>(url: string, options: HitOptions<T> = null, counterPosition?: number): Promise<any> {
+  async hit<T>(url: string, options: HitOptions<T> | null = null, counterPosition: number): Promise<any> {
+    if (!options) {
+      console.error(`[YandexMetric.hit] options ptr is not exist. For _counterPosition: ${counterPosition}`);
+      return null;
+    }
+
     const counter = await this.counterIsLoaded(counterPosition);
     if (!counter) {
       console.warn(`[YandexMetric.hit] Hit for page [${url}] can\'t be fired because counter is still loading`)
@@ -245,7 +264,7 @@ export class YandexMetric {
     });
   }
 
-  private counterIsLoaded(counterPosition?: number): Promise<any> {
+  private counterIsLoaded(counterPosition: number): Promise<any> {
     const counter = this.getCounterByPosition(counterPosition);
     if (counter && counter.reachGoal) {
       return Promise.resolve(counter);
@@ -254,14 +273,12 @@ export class YandexMetric {
     }
   }
 
-  private getCounterByPosition(counterPosition?: number) {
+  private getCounterByPosition(counterPosition: number) {
     const counterId = this.getCounterIdByPosition(counterPosition);
     return YandexMetric.getCounterById(counterId);
   }
 
   private getCounterIdByPosition(counterPosition: number): string {
-    return (counterPosition === undefined)
-      ? this.defaultCounterId
-      : this.positionToId[counterPosition];
+    return (counterPosition === undefined) ? this.defaultCounterId : this.positionToId[counterPosition];
   }
 }
