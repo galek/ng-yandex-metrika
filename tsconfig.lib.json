@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "dist/lib",
+    "outDir": "dist",
     "inlineSources": true,
     "emitDecoratorMetadata": true,
     "types": [],
