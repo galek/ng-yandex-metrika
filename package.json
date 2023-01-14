@@ -26,11 +26,11 @@
   },
   "sideEffects": false,
   "type": "module",
-  "types": "lib/index.d.ts",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
+  "types": "index.d.ts",
+  "main": "index.ts",
+  "module": "index.ts",
   "files": [
-    "dist"
+    "src/lib"
   ],
   "devDependencies": {
     "rimraf": "4.0.5"

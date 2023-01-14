@@ -1,1 +1,0 @@
-{"version":3,"file":"hitOptions.interface.js","sourceRoot":"","sources":["../../../../src/lib/common/interfaces/hitOptions.interface.ts"],"names":[],"mappings":"","sourcesContent":["import {CommonOptions} from \"./commonOptions.interface\";\r\n\r\nexport interface HitOptions<T> extends CommonOptions<T> {\r\n  referer: string;\r\n}\r\n"]}

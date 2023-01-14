@@ -10,7 +10,9 @@ import {
   YANDEX_COUNTERS_CONFIGS_AOT
 } from "./common/constants.service";
 
-@NgModule({})
+@NgModule({
+  declarations: [], imports: [], exports: [], providers: [], bootstrap: []
+})
 export class YandexMetricModule {
   static forRoot(configs: CounterConfig | CounterConfig[], defaultCounterId?: string): ModuleWithProviders<YandexMetricModule> {
     return {

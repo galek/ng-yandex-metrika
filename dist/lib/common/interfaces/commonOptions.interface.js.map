@@ -1,1 +1,0 @@
-{"version":3,"file":"commonOptions.interface.js","sourceRoot":"","sources":["../../../../src/lib/common/interfaces/commonOptions.interface.ts"],"names":[],"mappings":"","sourcesContent":["import {CallbackOptions} from \"./callbackOptions.interface\";\r\n\r\nexport interface CommonOptions<T> extends CallbackOptions {\r\n  params: T;\r\n  title: string;\r\n}\r\n"]}
